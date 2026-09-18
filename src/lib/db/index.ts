@@ -3,11 +3,14 @@ import 'server-only';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 
+import { configureNeonFetch } from './neon-config';
 import * as schema from './schema';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set.');
 }
+
+configureNeonFetch();
 
 /**
  * neon-http: one round trip per statement, no transactions. Every mutation in
