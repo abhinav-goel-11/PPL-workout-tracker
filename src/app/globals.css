@@ -1,26 +1,170 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+
+  /* App-specific semantic tokens */
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-cardio: var(--cardio);
+  --color-cardio-foreground: var(--cardio-foreground);
+  --color-warning: var(--warning);
+  --color-violet: var(--violet);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Dark-only app. :root and .dark carry identical values so there is no
+ * flash-of-light before hydration; <html> is hardcoded to class="dark".
+ */
+:root,
+.dark {
+  --radius: 0.75rem;
+
+  --background: #09090b; /* zinc-950 */
+  --foreground: #fafafa; /* zinc-50  */
+
+  --surface: #131316;
+  --surface-raised: #1c1c20;
+
+  --card: #131316;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+
+  /* Cyan — every PPL action */
+  --primary: #38bdf8;
+  --primary-foreground: #04222e;
+
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa; /* zinc-400 */
+
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+
+  /* Emerald — completion / success */
+  --success: #34d399;
+  --success-foreground: #04231a;
+
+  /* Rose — cardio supersets & finishers */
+  --cardio: #f43f5e;
+  --cardio-foreground: #2b0410;
+
+  --destructive: #f43f5e;
+
+  --border: #27272a;
+  --input: #3f3f46;
+  --ring: #38bdf8;
+
+  /* UI accents — distinct from the chart palette below. */
+  --warning: #fbbf24;
+  --violet: #a78bfa;
+
+  /*
+   * Chart series palette. Validated for this dark surface with the dataviz
+   * validator: lightness band, chroma floor, CVD separation, normal-vision
+   * floor and contrast all pass. Do not substitute by eye — re-run the
+   * validator if these change.
+   */
+  --chart-1: #3987e5; /* Push  */
+  --chart-2: #d95926; /* Pull  */
+  --chart-3: #199e70; /* Legs  */
+  --chart-4: #c98500; /* Core  */
+  --chart-5: #d55181; /* Cardio */
+
+  --sidebar: #131316;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #04222e;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #38bdf8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Bottom nav clearance + iOS home indicator */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    @apply font-sans;
+    /* Stop iOS rubber-band overscroll revealing white behind the app */
+    background-color: var(--background);
+  }
+
+  /* Kill the number-input spinners: set weights are typed, not stepped. */
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
