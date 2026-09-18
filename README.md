@@ -17,8 +17,17 @@ Next 16 · React 19 · TypeScript · Tailwind v4 · shadcn/ui · Drizzle · Neon
 
 ### 1. Database (Neon)
 
-Create a project at [neon.tech](https://neon.tech), copy the **pooled** connection string into
-`.env.local` as `DATABASE_URL`, then push the schema:
+Create a project at [neon.tech](https://neon.tech) — or add Neon from a Vercel project's
+**Storage** tab, which provisions it and injects the variables for you.
+
+Two variables, both pointing at the same database:
+
+| Variable | Endpoint | Used by |
+|---|---|---|
+| `DATABASE_URL` | pooled (host contains `-pooler`) | the app — `neon-http` opens a connection per query |
+| `DATABASE_URL_UNPOOLED` | direct | migrations — DDL takes advisory locks a transaction pooler can drop |
+
+Only `DATABASE_URL` is required; migrations fall back to it. Then create the tables:
 
 ```bash
 npm run db:migrate
@@ -101,6 +110,16 @@ surface whenever the cycle reaches them, on any day.
 
 ## Deploying to Vercel
 
-Set `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` and `AUTH_URL`, add the
-production callback URL to the Google client, and run `npm run db:migrate` against the production
-database.
+Adding Neon from the project's **Storage** tab provisions the database and sets `DATABASE_URL`
+and `DATABASE_URL_UNPOOLED` for you. Three things it does *not* do:
+
+1. **Create the tables.** Run `npm run db:migrate` once against the production database —
+   provisioning gives you an empty one.
+2. **Set the auth variables.** `AUTH_SECRET`, `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` live only
+   in your local `.env.local`, which is never committed. Add them in Settings → Environment
+   Variables.
+3. **Register the production callback.** Add
+   `https://<your-app>.vercel.app/api/auth/callback/google` to the Google client's authorised
+   redirect URIs, or sign-in fails with `redirect_uri_mismatch`.
+
+`AUTH_URL` is only needed if you use a custom domain; Vercel deployments infer the host.
